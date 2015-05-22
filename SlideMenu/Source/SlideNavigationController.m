@@ -520,6 +520,7 @@ static SlideNavigationController *singletonInstance;
 - (void)moveHorizontallyToLocation:(CGFloat)location
 {
 	CGRect rect = self.view.frame;
+	rect.origin.y = [self offsetFromTop];
 	UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
 	Menu menu = (self.horizontalLocation >= 0 && location >= 0) ? MenuLeft : MenuRight;
     
@@ -530,7 +531,7 @@ static SlideNavigationController *singletonInstance;
     if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0"))
     {
         rect.origin.x = location;
-        rect.origin.y = 0;
+        rect.origin.y = [self offsetFromTop];
     }
     else
     {
@@ -542,12 +543,25 @@ static SlideNavigationController *singletonInstance;
         else
         {
             rect.origin.x = (orientation == UIDeviceOrientationPortrait) ? location : location*-1;
-            rect.origin.y = 0;
+            rect.origin.y = [self offsetFromTop];
         }
     }
 	
 	self.view.frame = rect;
 	[self updateMenuAnimation:menu];
+}
+
+-(float)offsetFromTop
+{
+	UIView *view = self.view;
+	CGRect statusBarFrame = [[UIApplication sharedApplication] statusBarFrame];
+	CGRect statusBarWindowRect = [view.window convertRect:statusBarFrame fromWindow:nil];
+	CGRect statusBarViewRect = [view convertRect:statusBarWindowRect fromView:nil];
+	float fullHeight = statusBarViewRect.size.height;
+	float offset = fullHeight;
+	if (![UIApplication sharedApplication].statusBarHidden)
+		offset -= STATUS_BAR_HEIGHT;
+	return offset;
 }
 
 - (void)updateMenuAnimation:(Menu)menu
@@ -563,7 +577,7 @@ static SlideNavigationController *singletonInstance;
 {
 	CGRect rect = self.view.frame;
 	rect.origin.x = 0;
-	rect.origin.y = 0;
+	rect.origin.y = [self offsetFromTop];;
 	
 	if(SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7.0"))
     {

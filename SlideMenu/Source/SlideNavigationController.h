@@ -74,5 +74,6 @@ extern NSString  *const SlideNavigationControllerDidReveal;
 - (void)toggleLeftMenu;
 - (void)toggleRightMenu;
 - (BOOL)isMenuOpen;
+- (float)offsetFromTop;
 
 @end
